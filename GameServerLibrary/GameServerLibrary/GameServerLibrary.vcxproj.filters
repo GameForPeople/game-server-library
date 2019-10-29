@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Container">
+      <UniqueIdentifier>{ad587c46-687c-4ef2-9412-a74c32def410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Define">
+      <UniqueIdentifier>{3f31d953-a6e6-412d-a796-c8e5b8eb16b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container\Lockfree_Set_LinkedList">
+      <UniqueIdentifier>{d85466c7-6cf5-4368-8c07-96bfb30553d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container\Lockfree_Hash_Map">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Container\Lockfree_Hash_Map\LockFree_Hash_Map.h">
+      <Filter>Container\Lockfree_Hash_Map</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.h">
+      <Filter>Container\Lockfree_Set_LinkedList</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Container\Lockfree_Hash_Map\LockFree_Hash_Map.cpp">
+      <Filter>Container\Lockfree_Hash_Map</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Define</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Container\Lockfree_Hash_Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.cpp">
+      <Filter>Container\Lockfree_Set_LinkedList</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
