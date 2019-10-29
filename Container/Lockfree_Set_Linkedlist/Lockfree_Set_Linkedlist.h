@@ -3,17 +3,24 @@
 #include "../../GameServerLibrary/GameServerLibrary/stdafx.h"
 
 #ifndef WONSY_PCH
-#include <concurrent_queue.h>
+#include <iostream>
+#include <chrono>
+
 #include <atomic>
+
+#include <vector>
+#include <concurrent_queue.h>
 
 #define NDEBUG
 #include <cassert>
 
+#define	_DEPRECATED		[[deprecated]]
+#define _INLINE inline
 #define _DO_NOT_DELETE 
 #define _NOT_NULLPTR
-#define _INLINE inline
 
 using namespace std;
+using namespace std::chrono;
 using namespace concurrency;
 
 namespace ATOMIC_UTIL
@@ -28,7 +35,6 @@ namespace ATOMIC_UTIL
 		return atomic_compare_exchange_strong(reinterpret_cast<volatile std::atomic<TYPE>*>(addr), &oldValue, newValue);
 	};
 }
-
 #endif
 
 /*
@@ -121,7 +127,7 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 		bool Remove(const _KeyType key);
 		bool Contains(const _KeyType key);
 
-		void Display(const int dlsplayNum)
+		/*_DEPRECATED */ void Display(const int dlsplayNum)
 		{
 			auto ptr = head.markedPointer.GetPtr();
 
