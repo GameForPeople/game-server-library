@@ -84,6 +84,15 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 		_PointerType value;	// next Node Pointer(nBit) with removed Mark(1bit).
 	public:
 		MarkedPointer() noexcept;
+		~MarkedPointer() = default;
+
+		MarkedPointer(const MarkedPointer&) = default;
+		MarkedPointer& operator=(const MarkedPointer&) = default;
+
+		MarkedPointer(MarkedPointer&&) = delete;
+		MarkedPointer& operator=(MarkedPointer&&) = delete;
+
+	public:
 
 		void Set(const Node<_Data>* const node, const bool removed) noexcept;
 
@@ -103,11 +112,17 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 		_Data data;
 		MarkedPointer<_Data> markedPointer;
 
+	public:
 		Node() noexcept;
-		Node(const _Data data) noexcept;
+		Node(const _Data& data) noexcept;
 
 		~Node() = default;
-		
+		Node(const Node&) = delete;
+		Node& operator=(const Node&) = delete;
+
+		Node(Node&&) = delete;
+		Node& operator=(Node&&) = delete;
+
 		_KeyType key() noexcept;
 	};
 
@@ -119,6 +134,14 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 	public:
 		LockfreeSet(const int memoryPoolSize /* = GLOBAL::KEY_RANGE * 2 */) ;
 		~LockfreeSet();
+
+		LockfreeSet(const LockfreeSet&) = delete;
+		LockfreeSet& operator=(const LockfreeSet&) = delete;
+
+		LockfreeSet(LockfreeSet&&) = delete;
+		LockfreeSet& operator=(LockfreeSet&&) = delete;
+
+	public:
 		void Init();
 
 		void Find(const _KeyType key, Node<_Data>* (&pred), Node<_Data>* (&curr));
@@ -216,7 +239,7 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 	}
 
 	template<typename _Data>
-	Node<_Data>::Node(const _Data dataValue) noexcept
+	Node<_Data>::Node(const _Data& dataValue) noexcept
 		: data(dataValue)
 		, markedPointer()
 	{
