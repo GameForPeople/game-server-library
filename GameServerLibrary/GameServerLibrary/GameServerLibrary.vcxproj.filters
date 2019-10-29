@@ -14,6 +14,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Container\Lockfree_Map_LinkedList">
+      <UniqueIdentifier>{bfdb0ed5-7fee-47f8-8046-2aa4e04cd82b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Container\Lockfree_Hash_Map\LockFree_Hash_Map.h">
@@ -24,6 +27,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.h">
       <Filter>Container\Lockfree_Set_LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_Map_LinkedList\Lockfree_Map_LinkedList.h">
+      <Filter>Container\Lockfree_Map_LinkedList</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
