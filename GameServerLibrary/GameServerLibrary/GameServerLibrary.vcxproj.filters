@@ -36,8 +36,5 @@
     <ClCompile Include="main.cpp">
       <Filter>Container\Lockfree_Hash_Map</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.cpp">
-      <Filter>Container\Lockfree_Set_LinkedList</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

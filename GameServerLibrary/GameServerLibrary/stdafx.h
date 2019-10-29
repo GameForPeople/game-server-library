@@ -1,10 +1,15 @@
 #pragma once
 
+//-----
 #define WONSY_PCH
+//-----
 
 // C++ Base
 #include <iostream>
 #include <chrono>
+
+#define NDEBUG
+#include <cassert>
 
 // C++11
 #include <mutex>
@@ -29,11 +34,15 @@
 #include <concurrent_unordered_set.h>
 
 // Attributes
-#define		_NORETURN		[[noreturn]]
-#define		_DEPRECATED		[[deprecated]]
-#define		_MAYBE_UNUSED	[[maybe_unused]]
-#define		_FALLTHROUGH	[[fallthrough]]
-#define		_NODISCARD		[[nodiscard]]
+#define	_NORETURN		[[noreturn]]
+#define	_DEPRECATED		[[deprecated]]
+#define	_MAYBE_UNUSED	[[maybe_unused]]
+#define	_FALLTHROUGH	[[fallthrough]]
+#define	_NODISCARD		[[nodiscard]]
+
+#define	_INLINE			inline
+#define	_DO_NOT_DELETE	/* copyed pointer */	
+#define	_NOT_NULLPTR
 
 using namespace std;
 using namespace std::chrono;
