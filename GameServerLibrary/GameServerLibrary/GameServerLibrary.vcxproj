@@ -131,18 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Container\Lockfree_Hash_Map\LockFree_Hash_Map.h" />
+    <ClInclude Include="..\..\Container\Lockfree_Hash_Set\LockFree_Hash_Set.h" />
     <ClInclude Include="..\..\Container\Lockfree_Map_LinkedList\Lockfree_Map_LinkedList.h" />
     <ClInclude Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Container\Lockfree_Hash_Map\LockFree_Hash_Map.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

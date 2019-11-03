@@ -2,6 +2,8 @@
 
 #include "../../GameServerLibrary/GameServerLibrary/stdafx.h"
 
+#define WONSY_LOCKFREE_SET_LINKEDLIST
+
 #ifndef WONSY_PCH
 #include <iostream>
 #include <chrono>
