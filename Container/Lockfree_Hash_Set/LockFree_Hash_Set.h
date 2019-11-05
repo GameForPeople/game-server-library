@@ -3,6 +3,8 @@
 #include "../../GameServerLibrary/GameServerLibrary/stdafx.h"
 
 #define WONSY_LOCKFREE_HASH_SET
+#define WONSY_LOCKFREE_HASH_SET__USE_SIZE		// LockfreHashSet이 Size를 지원할 것인지.
+#define WONSY_LOCKFREE_HASH_SET__USE_ITERATOR  // LockfreHashSet이 Iterator를 지원할 것인지.
 
 #ifndef WONSY_PCH
 #include <iostream>
@@ -300,8 +302,9 @@ namespace WonSY::LOCKFREE_HASH_SET
 							addedNode = new Node<_Data>();
 
 							assert(false && "[Warning] Please set the memoryPoolSize!");
-							// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
-							// 충분히 할당해야 정상적으로 동작합니다.
+							// 메모리풀 사이즈가 넉넉하지 않을 경우
+							// 메모리 할당과 관련없이 비정상적으로 동작할 가능성이 매우 높습니다.
+							// assert문에 걸리기 전에, 이미 비정상적으로 동작할 가능성이 높으니 충분히 할당해주세요.
 						}
 						addedNode->data.SetKey(key);
 
@@ -391,19 +394,26 @@ namespace WonSY::LOCKFREE_HASH_SET
 	public:
 		pair<bool, LOCKFREE_SET_LINKEDLIST::Node<_Data>*> Add(const _KeyType key)
 		{
+#ifdef WONSY_LOCKFREE_HASH_SET__USE_SIZE
 			auto retValue = setCont[hashFunction(key)].Add(key);
 			if (retValue.first) ++size;
 			return retValue;
+#else
+			return setCont[hashFunction(key)].Add(key);
+#endif
 		}
-
 		bool Remove(const _KeyType key)
 		{
+#ifdef WONSY_LOCKFREE_HASH_SET__USE_SIZE
 			if (setCont[hashFunction(key)].Remove(key))
 			{
 				--size;
 				return true;
 			}
 			return false;
+#else			
+			return setCont[hashFunction(key)].Remove(key);
+#endif		
 		}
 
 		bool Contains(const _KeyType key)
@@ -455,7 +465,11 @@ namespace WonSY::LOCKFREE_HASH_SET
 	private:
 		std::function<_KeyType(_KeyType)> hashFunction;
 		std::vector<LOCKFREE_SET_LINKEDLIST::LockfreeSet<_Data>> setCont;
+		
+#ifdef WONSY_LOCKFREE_HASH_SET__USE_SIZE
 		std::atomic<int> size;
+		_INLINE const int GetSize() const noexcept { return size; };
+#endif
 	};
 }
 
@@ -464,7 +478,7 @@ namespace WonSY::LOCKFREE_HASH_SET
 #include <thread>
 #endif
 
-namespace WonSY::LOCKFREE_HASH_SET
+namespace WonSY::LOCKFREE_HASH_SET::TEST
 {
 	struct ExampleStruct
 	{
