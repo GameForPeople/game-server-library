@@ -4,6 +4,7 @@
 
 #define WONSY_LOCKFREE_SET_LINKEDLIST
 #define WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE		// LockfreeSet이 Size를 지원 여부입니다. 비활성화를 원할 시, 주석처리해주세요.
+#define WONSY_LOCKFREE_SET_LINKEDLIST__USE_ITERATOR  // LockfreeSet이 Iterator를 지원할 것인지.  비활성화를 원할 시, 주석처리해주세요.
 
 #ifndef WONSY_PCH
 // C++
@@ -61,6 +62,7 @@ namespace ATOMIC_UTIL
 	!4. _KeyType은 출력 연산자를 제공해야합니다.
 */
 
+// .h
 namespace WonSY::LOCKFREE_SET_LINKEDLIST
 {
 	namespace USING
@@ -77,6 +79,11 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 	template<typename _Data>
 	class Node;
+
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_ITERATOR
+	template<typename _Data>
+	struct LockfreeSetLinkedlistIterator;
+#endif
 
 	template<typename _Data>
 	class MarkedPointer
@@ -172,6 +179,14 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 			std::cout << "\n";
 		}
 
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_ITERATOR
+		template<typename _Data> friend struct LockfreeSetLinkedlistIterator;
+		
+		LockfreeSetLinkedlistIterator<_Data> begin();
+		
+		LockfreeSetLinkedlistIterator<_Data> end();
+#endif
+
 #ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
 	public:
 		_INLINE const int GetSize() const noexcept { return size; };
@@ -180,8 +195,24 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 		std::atomic<int> size;
 #endif
 	};
+
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_ITERATOR
+	template<typename _Data>
+	struct LockfreeSetLinkedlistIterator
+	{
+		Node<_Data>* node;
+		LockfreeSet<_Data>& pCont;
+
+		LockfreeSetLinkedlistIterator(LockfreeSet<_Data>& pCont, const bool isEnd);
+
+		void operator++();
+		bool operator!=(const LockfreeSetLinkedlistIterator& other);
+		_Data& operator*();
+	};
+#endif
 }
 
+// .hpp
 namespace WonSY::LOCKFREE_SET_LINKEDLIST
 {
 	template<typename _Data>
@@ -449,6 +480,59 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 		return curr->key() == key && !removed;
 	}
+
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_ITERATOR
+	template<typename _Data>
+	LockfreeSetLinkedlistIterator<_Data> LockfreeSet<_Data>::begin()
+	{
+		return LockfreeSetLinkedlistIterator<_Data>(*this, false);
+	}
+
+	template<typename _Data>
+	LockfreeSetLinkedlistIterator<_Data> LockfreeSet<_Data>::end()
+	{
+		return LockfreeSetLinkedlistIterator<_Data>(*this, true);
+	}
+	
+	template<typename _Data>
+	LockfreeSetLinkedlistIterator<_Data>::LockfreeSetLinkedlistIterator(LockfreeSet<_Data>& pCont, const bool isEnd)
+		: node(nullptr)
+		, pCont(pCont)
+	{
+		if (isEnd) { node = &(pCont.tail); }
+		else
+		{
+			node = &(pCont.head);
+			++(*this);
+		}
+	}
+
+	template<typename _Data>
+	void LockfreeSetLinkedlistIterator<_Data>::operator++()
+	{
+		bool removed;
+		_KeyType tailKey = pCont.tail.key();
+
+		while (true)
+		{
+			node = node->markedPointer.GetPtrWithRemoved(removed);
+			
+			if (!removed) { return; }
+		}
+	}
+
+	template<typename _Data>
+	bool LockfreeSetLinkedlistIterator<_Data>::operator!=(const LockfreeSetLinkedlistIterator& other)
+	{
+		return node->key() != other.node->key();
+	}
+
+	template<typename _Data>
+	_Data& LockfreeSetLinkedlistIterator<_Data>::operator*()
+	{
+		return node->data;
+	}
+#endif
 }
 
 
@@ -506,7 +590,15 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST::TEST
 			auto endTime = high_resolution_clock::now() - startTime;
 			std::cout << i << "개의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 
-			cont.Display(20);
+			// cont.Display(20);
+
+			int iterSize = 0;
+			for (auto iter = cont.begin(), endIter = cont.end(); iter != endIter; ++iter)
+			{
+				std::cout << (*iter).GetKey() << " ";
+				++iterSize;
+			}
+			std::cout << "iterSize : " << iterSize << std::endl;
 			std::cout << "Size : " << cont.GetSize() << std::endl;
 		}
 	}
