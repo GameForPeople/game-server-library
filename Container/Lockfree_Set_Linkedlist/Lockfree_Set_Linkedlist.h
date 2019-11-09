@@ -3,28 +3,37 @@
 #include "../../GameServerLibrary/GameServerLibrary/stdafx.h"
 
 #define WONSY_LOCKFREE_SET_LINKEDLIST
+#define WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE		// LockfreeSet이 Size를 지원 여부입니다. 비활성화를 원할 시, 주석처리해주세요.
 
 #ifndef WONSY_PCH
+// C++
 #include <iostream>
 #include <chrono>
-
-#include <atomic>
-
-#include <vector>
-#include <concurrent_queue.h>
 
 #define NDEBUG
 #include <cassert>
 
+// C++11
+#include <atomic>
+
+// C++ STL
+#include <vector>
+
+// C++ PPL
+#include <concurrent_queue.h>
+
+// Attributes or Others
 #define	_DEPRECATED		[[deprecated]]
 #define _INLINE inline
 #define _DO_NOT_DELETE 
 #define _NOT_NULLPTR
 
+// Using namespace
 using namespace std;
 using namespace std::chrono;
 using namespace concurrency;
 
+// UTILs
 namespace ATOMIC_UTIL
 {
 	template <class TYPE> bool T_CAS(std::atomic<TYPE>* addr, TYPE oldValue, TYPE newValue) noexcept
@@ -66,23 +75,19 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 	}using namespace USING;
 
-	namespace Define
-	{
-		constexpr _PointerType REMOVED_MASK = 0x01;
-
-#ifdef _WIN64
-		constexpr _PointerType POINTER_MASK = 0xFFFFFFFFFFFFFFFE;
-#else 
-		constexpr _PointerType POINTER_MASK = 0xFFFFFFFE;
-#endif
-	}using namespace Define;
-
 	template<typename _Data>
 	class Node;
 
 	template<typename _Data>
 	class MarkedPointer
 	{
+		constexpr static _PointerType REMOVED_MASK = 0x01;
+#ifdef _WIN64
+		constexpr static _PointerType POINTER_MASK = 0xFFFFFFFFFFFFFFFE;
+#else 
+		constexpr static _PointerType POINTER_MASK = 0xFFFFFFFE;
+#endif
+
 		_PointerType value;	// next Node Pointer(nBit) with removed Mark(1bit).
 	public:
 		MarkedPointer() noexcept;
@@ -166,6 +171,14 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 			std::cout << "\n";
 		}
+
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
+	public:
+		_INLINE const int GetSize() const noexcept { return size; };
+
+	private:
+		std::atomic<int> size;
+#endif
 	};
 }
 
@@ -255,28 +268,21 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 	template<typename _Data>
 	LockfreeSet<_Data>::LockfreeSet(const int memoryPoolSize) /*noexcept*/
-		: head(/*INT_MIN*/)
-		, tail(/*INT_MAX*/)
+		: head()
+		, tail()
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
+		, size()
+#endif
 	{
-		if /*constexpr*/ (typeid(_KeyType) == typeid(int))
+		if constexpr (is_pointer<_Data>::value)
 		{
-			head.data.SetKey(INT_MIN);
-			tail.data.SetKey(INT_MAX);
-		}
-		else if /*constexpr*/ (typeid(_KeyType) == typeid(long long))
-		{
-			head.data.SetKey(LLONG_MIN);
-			tail.data.SetKey(LLONG_MAX);
-		}
-		else if /*constexpr*/ (typeid(_KeyType) == typeid(short))
-		{
-			head.data.SetKey(SHRT_MIN);
-			tail.data.SetKey(SHRT_MAX);
+			head.data->SetKey(std::numeric_limits<_KeyType>::min());
+			tail.data->SetKey(std::numeric_limits<_KeyType>::max());
 		}
 		else
 		{
-			std::cout << "[ERROR] Need! Key Min Max Value!" << "\n";  
-			throw -1;
+			head.data.SetKey(std::numeric_limits<_KeyType>::min());
+			tail.data.SetKey(std::numeric_limits<_KeyType>::max());
 		}
 
 		head.markedPointer.Set(&tail, false);
@@ -341,6 +347,9 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 
 					curr = succ;
 					succ = curr->markedPointer.GetPtrWithRemoved(removed);
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
+					--size;
+#endif
 				}
 
 				if (curr->key() >= key) return;
@@ -359,29 +368,38 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 		Node<_Data>* pred{ nullptr };
 		Node<_Data>* curr{ nullptr };
 
+		Node<_Data>* addedNode{ nullptr };
+
 		while (7)
 		{
 			Find(key, pred, curr);
 
-			if (curr->key() == key) { return make_pair(false, nullptr); }
+			if (curr->key() == key) 
+			{ 
+				if (addedNode != nullptr) { memoryPool.push(addedNode); }
+				return make_pair(false, nullptr); 
+			}
 			else
 			{
-				Node<_Data>* addedNode{ nullptr };
-
-				if (!memoryPool.try_pop(addedNode))
+				if (addedNode == nullptr)
 				{
-					addedNode = new Node<_Data>();
+					if (!memoryPool.try_pop(addedNode))
+					{
+						addedNode = new Node<_Data>();
 
-					assert(false && "[Warning] Please set the memoryPoolSize!");
-					// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
-					// 충분히 할당해야 정상적으로 동작합니다.
+						assert(false && "[Warning] Please set the memoryPoolSize!");
+						// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
+						// 충분히 할당해야 정상적으로 동작합니다.
+					}
 				}
+
 				addedNode->data.SetKey(key);
-
 				addedNode->markedPointer.Set(curr, false);
-
 				if (pred->markedPointer.CAS(curr, addedNode, false, false)) 
 				{ 
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
+					++size;
+#endif
 					return make_pair(true, addedNode);
 				}
 			}
@@ -404,7 +422,13 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 				Node<_Data>* nextNodeOfDeletedNode = curr->markedPointer.GetPtr();
 
 				if (!curr->markedPointer.TryMark(nextNodeOfDeletedNode, true)) { continue; }
-				if (pred->markedPointer.CAS(curr, nextNodeOfDeletedNode, false, false)) { memoryPool.push(curr); }
+				if (pred->markedPointer.CAS(curr, nextNodeOfDeletedNode, false, false)) 
+				{ 
+					memoryPool.push(curr); 
+#ifdef WONSY_LOCKFREE_SET_LINKEDLIST__USE_SIZE
+					--size;
+#endif
+				}
 
 				return true;
 			}
@@ -433,7 +457,7 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 #include <thread>
 #endif
 
-namespace WonSY::LOCKFREE_SET_LINKEDLIST
+namespace WonSY::LOCKFREE_SET_LINKEDLIST::TEST
 {
 	struct ExampleStruct
 	{
@@ -483,6 +507,7 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 			std::cout << i << "개의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 
 			cont.Display(20);
+			std::cout << "Size : " << cont.GetSize() << std::endl;
 		}
 	}
 }
