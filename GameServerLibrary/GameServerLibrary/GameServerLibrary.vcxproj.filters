@@ -4,9 +4,6 @@
     <Filter Include="Container">
       <UniqueIdentifier>{ad587c46-687c-4ef2-9412-a74c32def410}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Define">
-      <UniqueIdentifier>{3f31d953-a6e6-412d-a796-c8e5b8eb16b2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Container\Lockfree_Set_LinkedList">
       <UniqueIdentifier>{d85466c7-6cf5-4368-8c07-96bfb30553d9}</UniqueIdentifier>
     </Filter>
@@ -16,6 +13,12 @@
     <Filter Include="Container\Lockfree_Hash_Set">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Lock">
+      <UniqueIdentifier>{8ac61dc7-ecd9-4424-8fe0-5db06ac9ca4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Define">
+      <UniqueIdentifier>{3f31d953-a6e6-412d-a796-c8e5b8eb16b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +33,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Container\Lockfree_Hash_Set\LockFree_Hash_Set.h">
       <Filter>Container\Lockfree_Hash_Set</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lock\Spin_Lock.h">
+      <Filter>Lock</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
