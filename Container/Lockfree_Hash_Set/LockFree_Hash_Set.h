@@ -7,8 +7,8 @@
 */
 
 #define WONSY_LOCKFREE_HASH_SET
-#define WONSY_LOCKFREE_HASH_SET__USE_SIZE		// LockfreHashSet이 Size를 지원 여부입니다. 비활성화를 원할 시, 주석처리해주세요.
-#define WONSY_LOCKFREE_HASH_SET__USE_ITERATOR  // LockfreHashSet이 Iterator를 지원할 것인지.  비활성화를 원할 시, 주석처리해주세요.
+#define WONSY_LOCKFREE_HASH_SET__USE_SIZE		// LockfreeHashSet이 Size를 지원 여부입니다. 비활성화를 원할 시, 주석처리해주세요.
+#define WONSY_LOCKFREE_HASH_SET__USE_ITERATOR  // LockfreeHashSet이 Iterator를 지원할 것인지.  비활성화를 원할 시, 주석처리해주세요.
 
 #ifndef WONSY_PCH
 // C++
@@ -201,8 +201,8 @@ namespace WonSY::LOCKFREE_HASH_SET
 
 		public:
 			LockfreeSet(const int memoryPoolSize) /*noexcept*/
-				: head(/*INT_MIN*/)
-				, tail(/*INT_MAX*/)
+				: head()
+				, tail()
 			{
 				if constexpr (is_pointer<_Data>::value)
 				{
@@ -468,13 +468,14 @@ namespace WonSY::LOCKFREE_HASH_SET
 			for (auto& set : setCont) { set.DoFunc(function, parameter...); };
 		}
 
-		void Display()
+		void Display(int displayCount = 10)
 		{
 			for (auto& set : setCont)
 			{
-				set.Display(20);
+				set.Display(displayCount);
 				std::cout << "\n";
 			}
+			
 			std::cout << "\n";
 			std::cout << "\n";
 		}
@@ -649,7 +650,7 @@ namespace WonSY::LOCKFREE_HASH_SET::TEST
 			std::cout << " iterCount : " << iterCount << "\n";
 			std::cout << " size : " << cont.GetSize() << "\n";
 
-			// Function VS
+			// Iter VS Function
 			{
 				auto startTime = high_resolution_clock::now();
 				for (auto iter = cont.begin(); iter != cont.end(); ++iter)
@@ -665,6 +666,8 @@ namespace WonSY::LOCKFREE_HASH_SET::TEST
 				auto endTime = high_resolution_clock::now() - startTime;
 				std::cout << " 함수 인자의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n\n\n";
 			}
+
+			cont.Display();
 		}
 
 		// Set - Linkedlist

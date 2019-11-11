@@ -2,6 +2,7 @@
 
 //#include "../GameServerLibrary/GameServerLibrary/stdafx.h"
 
+#define WONSY_TEST
 #define WONSY_SPIN_LOCK
 
 #ifndef WONSY_PCH
@@ -54,7 +55,7 @@ namespace WonSY::SPIN_LOCK
 			_InterlockedExchange(&_lock, 0);
 #endif // hardware
 		}
-
+		
 		SpinLock_0() : _lock(0) {};
 		~SpinLock_0() { _lock = 0; };
 
@@ -204,10 +205,102 @@ namespace WonSY::SPIN_LOCK
 		mutable atomic<bool> _flag;
 	};
 
-	using SpinLock = SpinLock_5;
+	class SpinLock_7
+	{
+	public:
+		_INLINE void lock() const noexcept
+		{
+			while (_flag)
+			{
+				TIME_TO_SLEEP:
+				_mm_pause();
+			}
+
+			while (_flag.exchange(true, std::memory_order::memory_order_acquire))
+			{
+				goto TIME_TO_SLEEP;
+			}
+		}
+
+		_INLINE void unlock() const noexcept
+		{
+			_flag.store(false, std::memory_order::memory_order_release);
+		}
+
+		SpinLock_7() noexcept : _flag(false) {};
+		~SpinLock_7() { unlock(); };
+
+	private:
+		mutable atomic<bool> _flag;
+	};
+
+	class SpinLock_8
+	{
+	public:
+		_INLINE void lock() const noexcept
+		{
+			while (_flag)
+			{
+				std::this_thread::yield();
+			TIME_TO_SLEEP:
+				{
+
+				}
+			}
+
+			while (_flag.exchange(true, std::memory_order::memory_order_acquire))
+			{
+				goto TIME_TO_SLEEP;
+			}
+		}
+
+		_INLINE void unlock() const noexcept
+		{
+			_flag.store(false, std::memory_order::memory_order_release);
+		}
+
+		SpinLock_8() noexcept : _flag(false) {};
+		~SpinLock_8() { unlock(); };
+
+	private:
+		mutable atomic<bool> _flag;
+	};
+
+	class SpinLock_9
+	{
+	public:
+		_INLINE void lock() const noexcept
+		{
+			while (_flag)
+			{
+			TIME_TO_SLEEP:
+				{
+
+				}
+			}
+
+			while (_flag.exchange(true, std::memory_order::memory_order_acquire))
+			{
+				goto TIME_TO_SLEEP;
+			}
+		}
+
+		_INLINE void unlock() const noexcept
+		{
+			_flag.store(false, std::memory_order::memory_order_release);
+		}
+
+		SpinLock_9() noexcept : _flag(false) {};
+		~SpinLock_9() { unlock(); };
+
+	private:
+		mutable atomic<bool> _flag;
+	};
+
+	using SpinLock = SpinLock_8;
 
 #ifdef WONSY_TEST
-	class SpinLock_7
+	class RWSpinLock_0
 	{
 		static constexpr unsigned char WRITE_FLAG = 0x7F; // 1000 0000
 		static constexpr unsigned char READ_VALUE = 0x01; // 0000 0001
@@ -262,14 +355,14 @@ namespace WonSY::SPIN_LOCK
 			--(_flag);
 		}
 
-		SpinLock_7() noexcept : _flag(UNSIGNED_CHAR_ZERO) {};
-		~SpinLock_7() { unlock(); };
+		RWSpinLock_0() noexcept : _flag(UNSIGNED_CHAR_ZERO) {};
+		~RWSpinLock_0() { unlock(); };
 
 	private:
 		mutable atomic<unsigned char> _flag;
 	};
 
-	using Shared_SpinLock = SpinLock_7;
+	using Shared_SpinLock = RWSpinLock_0;
 #endif
 }
 
@@ -300,6 +393,7 @@ namespace WonSY::SPIN_LOCK::TEST
 	void TestFunc_SpinLocks()
 	{
 		{
+
 			std::vector<std::thread> threadCont;
 			threadCont.reserve(THREAD_COUNT);
 
@@ -325,7 +419,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -356,7 +450,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -387,7 +481,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -418,7 +512,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -449,7 +543,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -480,7 +574,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -511,7 +605,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -522,6 +616,99 @@ namespace WonSY::SPIN_LOCK::TEST
 
 			long long buffer{ 0 };
 			SpinLock_7 spinLock;
+
+			auto startTime = high_resolution_clock::now();
+
+			for (int i = 0; i < THREAD_COUNT; ++i)
+			{
+				threadCont.emplace_back([&]() {
+					for (int j = 0
+						; j < NUM_TEST
+						; j++)
+					{
+						spinLock.lock();
+						++buffer;
+						spinLock.unlock();
+					}
+				});
+			}
+
+			for (auto& thread : threadCont) { thread.join(); }
+
+			auto endTime = high_resolution_clock::now() - startTime;
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << "값은? " << buffer << "\n";
+			std::cout << "\n";
+		}
+
+		{
+			std::vector<std::thread> threadCont;
+			threadCont.reserve(THREAD_COUNT);
+
+			long long buffer{ 0 };
+			SpinLock_8 spinLock;
+
+			auto startTime = high_resolution_clock::now();
+
+			for (int i = 0; i < THREAD_COUNT; ++i)
+			{
+				threadCont.emplace_back([&]() {
+					for (int j = 0
+						; j < NUM_TEST
+						; j++)
+					{
+						spinLock.lock();
+						++buffer;
+						spinLock.unlock();
+					}
+				});
+			}
+
+			for (auto& thread : threadCont) { thread.join(); }
+
+			auto endTime = high_resolution_clock::now() - startTime;
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << "값은? " << buffer << "\n";
+			std::cout << "\n";
+		}
+
+		{
+			std::vector<std::thread> threadCont;
+			threadCont.reserve(THREAD_COUNT);
+
+			long long buffer{ 0 };
+			SpinLock_9 spinLock;
+
+			auto startTime = high_resolution_clock::now();
+
+			for (int i = 0; i < THREAD_COUNT; ++i)
+			{
+				threadCont.emplace_back([&]() {
+					for (int j = 0
+						; j < NUM_TEST
+						; j++)
+					{
+						spinLock.lock();
+						++buffer;
+						spinLock.unlock();
+					}
+				});
+			}
+
+			for (auto& thread : threadCont) { thread.join(); }
+
+			auto endTime = high_resolution_clock::now() - startTime;
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << "값은? " << buffer << "\n";
+			std::cout << "\n";
+		}
+
+		{
+			std::vector<std::thread> threadCont;
+			threadCont.reserve(THREAD_COUNT);
+
+			long long buffer{ 0 };
+			RWSpinLock_0 spinLock;
 
 			auto startTime = high_resolution_clock::now();
 
@@ -551,7 +738,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			for (auto& thread : threadCont) { thread.join(); }
 
 			auto endTime = high_resolution_clock::now() - startTime;
-			std::cout << "성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
+			std::cout << typeid(spinLock).name() << "의 성능은? " << duration_cast<milliseconds>(endTime).count() << " msecs\n";
 			std::cout << "값은? " << buffer << "\n";
 			std::cout << "\n";
 		}
@@ -889,7 +1076,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			threadCont.reserve(THREAD_COUNT);
 
 			long long buffer{ 0 };
-			SpinLock_5 spinLock;
+			SpinLock spinLock;
 
 			auto startTime = high_resolution_clock::now();
 
@@ -920,7 +1107,7 @@ namespace WonSY::SPIN_LOCK::TEST
 			threadCont.reserve(THREAD_COUNT);
 
 			long long buffer{ 0 };
-			SpinLock_5 spinLock;
+			SpinLock spinLock;
 
 			auto startTime = high_resolution_clock::now();
 
