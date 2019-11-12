@@ -20,6 +20,9 @@
     <Filter Include="Define">
       <UniqueIdentifier>{3f31d953-a6e6-412d-a796-c8e5b8eb16b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Container\Lockfree_Stack">
+      <UniqueIdentifier>{e8ac8b13-e418-43bc-a48f-78d05838ecf8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -28,14 +31,17 @@
     <ClInclude Include="..\..\Container\Lockfree_Set_Linkedlist\Lockfree_Set_Linkedlist.h">
       <Filter>Container\Lockfree_Set_LinkedList</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Container\Lockfree_Map_LinkedList\Lockfree_Map_LinkedList.h">
-      <Filter>Container\Lockfree_Map_LinkedList</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Container\Lockfree_Hash_Set\LockFree_Hash_Set.h">
-      <Filter>Container\Lockfree_Hash_Set</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Lock\Spin_Lock.h">
       <Filter>Lock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_Stack\Lockfree_Stack.h">
+      <Filter>Container\Lockfree_Stack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_Map_LinkedList\Lockfree_Map_Linkedlist.h">
+      <Filter>Container\Lockfree_Map_LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_Hash_Set\Lockfree_Hash_Set.h">
+      <Filter>Container\Lockfree_Hash_Set</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
