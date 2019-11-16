@@ -295,28 +295,35 @@ namespace WonSY::LOCKFREE_HASH_SET
 				Node<_Data>* pred{ nullptr };
 				Node<_Data>* curr{ nullptr };
 
+				Node<_Data>* addedNode{ nullptr };
+
 				while (7)
 				{
 					Find(key, pred, curr);
 
-					if (curr->key() == key) { return make_pair(false, nullptr); }
+					if (curr->key() == key) 
+					{ 
+						if (addedNode != nullptr) { memoryPool.push(addedNode); }
+						return make_pair(false, nullptr);
+					}
 					else
 					{
-						Node<_Data>* addedNode{ nullptr };
-
-						if (!memoryPool.try_pop(addedNode))
+						if (addedNode == nullptr)
 						{
-							addedNode = new Node<_Data>();
+							if (!memoryPool.try_pop(addedNode))
+							{
+								addedNode = new Node<_Data>();
 
-							assert(false && "[Warning] Please set the memoryPoolSize!");
-							// 메모리풀 사이즈가 넉넉하지 않을 경우
-							// 메모리 할당과 관련없이 비정상적으로 동작할 가능성이 매우 높습니다.
-							// assert문에 걸리기 전에, 이미 비정상적으로 동작할 가능성이 높으니 충분히 할당해주세요.
+								assert(false && "[Warning] Please set the memoryPoolSize!");
+								// 메모리풀 사이즈가 넉넉하지 않을 경우
+								// 메모리 할당과 관련없이 비정상적으로 동작할 가능성이 매우 높습니다.
+								// assert문에 걸리기 전에, 이미 비정상적으로 동작할 가능성이 높으니 충분히 할당해주세요.
+							}
+
+							if constexpr (is_pointer<_Data>::value) { addedNode->data->SetKey(key); }
+							else { addedNode->data.SetKey(key); }
+
 						}
-
-						if constexpr (is_pointer<_Data>::value) { addedNode->data->SetKey(key); }
-						else { addedNode->data.SetKey(key); }
-
 						addedNode->markedPointer.Set(curr, false);
 
 						if (pred->markedPointer.CAS(curr, addedNode, false, false))

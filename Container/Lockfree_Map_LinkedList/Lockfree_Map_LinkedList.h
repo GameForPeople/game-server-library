@@ -362,26 +362,31 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 		Node<_Key, _Data>* pred{ nullptr };
 		Node<_Key, _Data>* curr{ nullptr };
 
+		Node<_Key, _Data>* addedNode{ nullptr };
+
 		while (7)
 		{
 			Find(key, pred, curr);
 
-			if (curr->key == key) { return make_pair(false, nullptr); }
+			if (curr->key == key) { 
+				if (addedNode != nullptr) { memoryPool.push(addedNode); }
+				return make_pair(false, nullptr); 
+			}
 			else
 			{
-				Node<_Key, _Data>* addedNode{ nullptr };
-
-				if (!memoryPool.try_pop(addedNode))
+				if (addedNode == nullptr)
 				{
-					addedNode = new Node<_Key, _Data>();
+					if (!memoryPool.try_pop(addedNode))
+					{
+						addedNode = new Node<_Key, _Data>();
 
-					assert(false && "[Warning] Please set the memoryPoolSize!");
-					// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
-					// 충분히 할당해야 정상적으로 동작합니다.
+						assert(false && "[Warning] Please set the memoryPoolSize!");
+						// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
+						// 충분히 할당해야 정상적으로 동작합니다.
+					}
+					addedNode->key = key;
+					addedNode->data = data;
 				}
-				addedNode->key = key;
-				addedNode->data = data;
-
 				addedNode->markedPointer.Set(curr, false);
 
 				if (pred->markedPointer.CAS(curr, addedNode, false, false))

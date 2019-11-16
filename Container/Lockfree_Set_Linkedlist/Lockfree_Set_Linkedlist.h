@@ -422,9 +422,9 @@ namespace WonSY::LOCKFREE_SET_LINKEDLIST
 						// 메모리풀 사이즈가 넉넉하지 않을 경우, 비정상적으로 동작할 가능성이 높습니다.
 						// 충분히 할당해야 정상적으로 동작합니다.
 					}
+					addedNode->data.SetKey(key);
 				}
 
-				addedNode->data.SetKey(key);
 				addedNode->markedPointer.Set(curr, false);
 				if (pred->markedPointer.CAS(curr, addedNode, false, false)) 
 				{ 
