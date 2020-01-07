@@ -3,6 +3,7 @@
 #include "../../GameServerLibrary/GameServerLibrary/stdafx.h"
 
 #define WONSY_LOCKFREE_MAP_LINKEDLIST
+#define WONSY_LOCKFREE_MAP_LINKEDLIST__USE_SIZE		// LockfreeMap이 Size를 지원 여부입니다. 비활성화를 원할 시, 주석처리해주세요.
 
 #ifndef WONSY_PCH
 #include <iostream>
@@ -158,6 +159,14 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 
 			std::cout << "\n";
 		}
+
+#ifdef WONSY_LOCKFREE_MAP_LINKEDLIST__USE_SIZE
+	public:
+		_INLINE const int GetSize() const noexcept { return size; };
+
+	private:
+		std::atomic<int> size;
+#endif
 	};
 }
 
@@ -258,28 +267,21 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 #pragma region [ LockfreeMap ]
 	template<typename _Key, typename _Data>
 	LockfreeMap<_Key, _Data>::LockfreeMap(const int memoryPoolSize) /*noexcept*/
-		: head(/*INT_MIN*/)
-		, tail(/*INT_MAX*/)
+		: head()
+		, tail()
+#ifdef	WONSY_LOCKFREE_MAP_LINKEDLIST__USE_SIZE
+		, size()
+#endif
 	{
-		if /*constexpr*/ (typeid(_Key) == typeid(int))
+		if constexpr (is_pointer<_Data>::value)
 		{
-			head.key = INT_MIN;
-			tail.key = INT_MAX;
-		}
-		else if /*constexpr*/ (typeid(_Key) == typeid(long long))
-		{
-			head.key = LLONG_MIN;
-			tail.key = LLONG_MAX;
-		}
-		else if /*constexpr*/ (typeid(_Key) == typeid(short))
-		{
-			head.key = SHRT_MIN;
-			tail.key = SHRT_MAX;
+			head.data->SetKey(std::numeric_limits<typename _Key>::min());
+			tail.data->SetKey(std::numeric_limits<typename _Key>::max());
 		}
 		else
 		{
-			std::cout << "[ERROR] Need! Key Min Max Value!" << "\n";
-			throw - 1;
+			head.data.SetKey(std::numeric_limits<typename _Key>::min());
+			tail.data.SetKey(std::numeric_limits<typename _Key>::max());
 		}
 
 		head.markedPointer.Set(&tail, false);
@@ -368,7 +370,8 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 		{
 			Find(key, pred, curr);
 
-			if (curr->key == key) { 
+			if (curr->key == key) 
+			{ 
 				if (addedNode != nullptr) { memoryPool.push(addedNode); }
 				return make_pair(false, nullptr); 
 			}
@@ -391,6 +394,9 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 
 				if (pred->markedPointer.CAS(curr, addedNode, false, false))
 				{
+#ifdef WONSY_LOCKFREE_MAP_LINKEDLIST__USE_SIZE
+					++size;
+#endif
 					return make_pair(true, addedNode);
 				}
 			}
@@ -413,7 +419,13 @@ namespace WonSY::LOCKFREE_MAP_LINKEDLIST
 				Node<_Key, _Data>* nextNodeOfDeletedNode = curr->markedPointer.GetPtr();
 
 				if (!curr->markedPointer.TryMark(nextNodeOfDeletedNode, true)) { continue; }
-				if (pred->markedPointer.CAS(curr, nextNodeOfDeletedNode, false, false)) { memoryPool.push(curr); }
+				if (pred->markedPointer.CAS(curr, nextNodeOfDeletedNode, false, false)) 
+				{ 
+					memoryPool.push(curr); 
+#ifdef WONSY_LOCKFREE_MAP_LINKEDLIST__USE_SIZE
+					--size;
+#endif
+				}
 
 				return true;
 			}
