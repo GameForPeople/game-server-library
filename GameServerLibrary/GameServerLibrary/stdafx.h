@@ -19,6 +19,8 @@
 
 // C++ 17
 #include <shared_mutex>
+#include <string_view>
+#include <optional>
 
 // C++ STL
 #include <unordered_set>
@@ -59,4 +61,11 @@ namespace ATOMIC_UTIL
 	{
 		return atomic_compare_exchange_strong(reinterpret_cast<volatile std::atomic<TYPE>*>(addr), &oldValue, newValue);
 	};
+}
+
+namespace ERROR_UTIL
+{
+	_NORETURN void Error(const std::string_view errorString);
+
+	_NORETURN void Error(const std::wstring_view errorString);
 }

@@ -23,6 +23,24 @@
     <Filter Include="Container\Lockfree_Stack">
       <UniqueIdentifier>{e8ac8b13-e418-43bc-a48f-78d05838ecf8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Container\Lockfree_SkipList">
+      <UniqueIdentifier>{a22115bd-116f-44d5-abfe-4bfb036adc2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{c31569a1-2353-4747-b980-30134c6a5815}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameServer">
+      <UniqueIdentifier>{43977d2f-ff38-4a3a-8267-1dcb73aff910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameServer\BaseGameServer">
+      <UniqueIdentifier>{d6c4650e-b2c5-4750-ab7c-f02b0cee086f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\ConnectManager">
+      <UniqueIdentifier>{428b9577-2dab-4a8e-823e-86228b9c794c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\TimerManager">
+      <UniqueIdentifier>{8c3e0c16-653e-48c3-b60b-cf40ace7d29e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -43,11 +61,32 @@
     <ClInclude Include="..\..\Container\Lockfree_Hash_Set\Lockfree_Hash_Set.h">
       <Filter>Container\Lockfree_Hash_Set</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Container\Lockfree_SkipList\Lockfree_Skiplist.h">
+      <Filter>Container\Lockfree_SkipList</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GameServer\BaseGameServer\BaseGameServer.h">
+      <Filter>GameServer\BaseGameServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Manager\ConnectManager.h">
+      <Filter>Manager\ConnectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Manager\TimerManager\TimerManager.h">
+      <Filter>Manager\TimerManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Define</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\GameServer\BaseGameServer\BaseGameServer.cpp">
+      <Filter>GameServer\BaseGameServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Manager\ConnectManager.cpp">
+      <Filter>Manager\ConnectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Manager\TimerManager\TimerManager.cpp">
+      <Filter>Manager\TimerManager</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
